@@ -2,7 +2,7 @@
 
 > A deep-dive exploratory data analysis of a multi-table e-commerce dataset — uncovering conversion bottlenecks, customer segments, product performance, and city-level opportunities.
 
-🌐 **[View Project Website →](https://your-username.github.io/ecommerce-analysis)**
+🌐 **[View Project Website →]https://vyomvy.github.io/ecommerce-user-conversion-analysis/**
 
 ---
 
@@ -28,24 +28,6 @@ This project analyses an e-commerce platform's transactional and behavioural dat
 - How long does it take users to go from signup to first order?
 
 The analysis spans **8,594 users**, **19,611 orders**, **2,000 products** across **10 categories** and **12 brands**.
-
----
-
-## Key Findings
-
-| Metric | Value |
-|---|---|
-| Total Revenue (completed + shipped) | ₹47,23,771 |
-| Average Order Value | ₹592.55 |
-| User Conversion Rate | 80.3% |
-| Repeat Purchase Rate | 67.5% |
-| View → Purchase Conversion | 7.2% |
-| Top 10% Customers → Revenue Share | 33.5% |
-
-- 📉 **Biggest funnel drop-off** is at View → Cart (78.5% drop), not at checkout
-- ⚠️ **Electronics** has the highest revenue among low-rated products (avg 2.76/5)
-- 🏙️ **1,542 cities** show high revenue from very few users — untapped markets
-- 🔁 **63% of users** placed their first order before creating an account
 
 ---
 
@@ -108,8 +90,7 @@ All charts are saved in the `images/` folder:
 4. Run all cells in order
 
 ```bash
-git clone https://github.com/your-username/ecommerce-analysis.git
-```
+git clone https://github.com/vyomvy/ecommerce-user-conversion-analysis
 
 ---
 
