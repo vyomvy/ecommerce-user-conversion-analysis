@@ -9,7 +9,6 @@
 ## 📌 Table of Contents
 
 - [Project Overview](#project-overview)
-- [Key Findings](#key-findings)
 - [Dataset](#dataset)
 - [Analysis Sections](#analysis-sections)
 - [Visualisations](#visualisations)
