@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>E-Commerce Analysis | Data Project</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #1e1e2e;
+    --accent: #f5c542;
+    --accent2: #5ee7b0;
+    --accent3: #ff7eb3;
+    --text: #e8e8f0;
+    --muted: #7b7b99;
+    --card: #14141f;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 3rem;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--accent); }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 8rem 3rem 5rem;
+    overflow: hidden;
+  }
+
+  .hero-glow {
+    position: absolute;
+    top: -200px; left: -200px;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(245,197,66,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-glow2 {
+    position: absolute;
+    bottom: -150px; right: -150px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(94,231,176,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.2s;
+  }
+
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(3rem, 7vw, 6.5rem);
+    line-height: 1.05;
+    max-width: 900px;
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards 0.4s;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    margin-top: 1.5rem;
+    font-size: 1.1rem;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.8;
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards 0.6s;
+  }
+
+  .hero-actions {
+    margin-top: 2.5rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards 0.8s;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 2rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    font-family: 'Outfit', sans-serif;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #0a0a0f;
+  }
+
+  .btn-primary:hover {
+    background: #f9d766;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(245,197,66,0.3);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .btn-outline:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  /* ── STATS STRIP ── */
+  .stats-strip {
+    display: flex;
+    gap: 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    background: var(--surface);
+  }
+
+  .stat-item {
+    flex: 1;
+    min-width: 180px;
+    padding: 2rem 2.5rem;
+    border-right: 1px solid var(--border);
+  }
+
+  .stat-item:last-child { border-right: none; }
+
+  .stat-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.2rem;
+    color: var(--accent);
+    display: block;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    margin-top: 0.25rem;
+  }
+
+  /* ── SECTION ── */
+  section {
+    padding: 6rem 3rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--accent2);
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    margin-bottom: 1rem;
+    line-height: 1.2;
+  }
+
+  .section-desc {
+    color: var(--muted);
+    max-width: 600px;
+    margin-bottom: 3rem;
+    font-size: 1rem;
+  }
+
+  /* ── FINDINGS GRID ── */
+  .findings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5px;
+    background: var(--border);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .finding-card {
+    background: var(--card);
+    padding: 2rem;
+    transition: background 0.2s;
+    cursor: default;
+  }
+
+  .finding-card:hover { background: #1a1a2a; }
+
+  .finding-number {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+
+  .finding-stat {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .finding-stat.green { color: var(--accent2); }
+  .finding-stat.pink  { color: var(--accent3); }
+
+  .finding-title {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+  }
+
+  .finding-desc {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* ── VISUALS ── */
+  .visuals-section {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 6rem 3rem;
+  }
+
+  .visuals-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .visuals-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+
+  @media (max-width: 720px) { .visuals-grid { grid-template-columns: 1fr; } }
+
+  .viz-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .viz-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+  }
+
+  .viz-img {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+    background: #1a1a2a;
+  }
+
+  /* Placeholder styling if image not found */
+  .viz-img-placeholder {
+    width: 100%;
+    height: 240px;
+    background: linear-gradient(135deg, #1a1a2a 0%, #0f0f1a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+  }
+
+  .viz-meta {
+    padding: 1.25rem 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .viz-title {
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .viz-insight {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ── FUNNEL ── */
+  .funnel-section {
+    padding: 6rem 3rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .funnel-bar-wrap {
+    margin-top: 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .funnel-row {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .funnel-label {
+    min-width: 80px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .funnel-bar-bg {
+    flex: 1;
+    height: 36px;
+    background: var(--surface);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--border);
+  }
+
+  .funnel-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1.2s cubic-bezier(0.16,1,0.3,1);
+    display: flex;
+    align-items: center;
+    padding-left: 1rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--bg);
+  }
+
+  .f-view  { background: var(--accent);  width: 100%; }
+  .f-cart  { background: var(--accent2); width: 21.5%; }
+  .f-buy   { background: var(--accent3); width: 7.2%; }
+
+  .funnel-num {
+    min-width: 60px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--text);
+    text-align: right;
+  }
+
+  /* ── RECOMMENDATIONS ── */
+  .reco-list {
+    margin-top: 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .reco-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 1.75rem 2rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--card);
+    transition: background 0.2s;
+  }
+
+  .reco-item:last-child { border-bottom: none; }
+  .reco-item:hover { background: #1a1a2a; }
+
+  .reco-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+
+  .reco-content {}
+
+  .reco-title {
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+  }
+
+  .reco-body {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* ── TECH ── */
+  .tech-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+
+  .chip {
+    padding: 0.5rem 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+  }
+
+  .chip:hover {
+    border-color: var(--accent2);
+    color: var(--accent2);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .footer-left {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .footer-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover { color: var(--accent); }
+
+  /* ── DIVIDER ── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    max-width: 100%;
+  }
+
+  /* ── ANIM ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── TOC SIDEBAR (decorative) ── */
+  .toc-indicator {
+    position: fixed;
+    right: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    z-index: 50;
+  }
+
+  .toc-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: all 0.3s;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .toc-dot.active {
+    background: var(--accent);
+    box-shadow: 0 0 8px rgba(245,197,66,0.6);
+  }
+
+  .toc-dot:hover .toc-tip {
+    opacity: 1;
+    transform: translateX(-8px);
+  }
+
+  .toc-tip {
+    position: absolute;
+    right: 16px;
+    top: -6px;
+    white-space: nowrap;
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-family: 'DM Mono', monospace;
+    color: var(--text);
+    opacity: 0;
+    transform: translateX(0);
+    transition: all 0.2s;
+    pointer-events: none;
+  }
+
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    .hero { padding: 6rem 1.5rem 4rem; }
+    section, .funnel-section { padding: 4rem 1.5rem; }
+    .visuals-section { padding: 4rem 1.5rem; }
+    footer { padding: 2rem 1.5rem; }
+    .stat-item { padding: 1.5rem; }
+    .toc-indicator { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">ecom_analysis.ipynb</div>
+  <ul class="nav-links">
+    <li><a href="#findings">Findings</a></li>
+    <li><a href="#visuals">Visuals</a></li>
+    <li><a href="#funnel">Funnel</a></li>
+    <li><a href="#recommendations">Insights</a></li>
+    <li><a href="https://github.com/your-username/ecommerce-analysis" target="_blank" rel="noopener">GitHub ↗</a></li>
+  </ul>
+</nav>
+
+<!-- TOC DOTS -->
+<div class="toc-indicator">
+  <div class="toc-dot active" onclick="scrollTo('#hero')"><span class="toc-tip">Overview</span></div>
+  <div class="toc-dot" onclick="scrollTo('#findings')"><span class="toc-tip">Findings</span></div>
+  <div class="toc-dot" onclick="scrollTo('#visuals')"><span class="toc-tip">Visuals</span></div>
+  <div class="toc-dot" onclick="scrollTo('#funnel')"><span class="toc-tip">Funnel</span></div>
+  <div class="toc-dot" onclick="scrollTo('#recommendations')"><span class="toc-tip">Insights</span></div>
+</div>
+
+<!-- HERO -->
+<div class="hero" id="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-tag">— Data Analysis Project · Python · Pandas · Matplotlib</div>
+  <h1>E-Commerce <em>Behavioral</em> & Revenue Analysis</h1>
+  <p class="hero-sub">Uncovering conversion bottlenecks, high-value segments, and untapped growth opportunities across 8,594 users, 19,611 orders, and a 2,000-product catalogue.</p>
+  <div class="hero-actions">
+    <a href="https://github.com/your-username/ecommerce-analysis" target="_blank" class="btn btn-primary">View on GitHub ↗</a>
+    <a href="#findings" class="btn btn-outline">Explore Findings ↓</a>
+  </div>
+</div>
+
+<!-- STATS STRIP -->
+<div class="stats-strip">
+  <div class="stat-item">
+    <span class="stat-value">₹47.2L</span>
+    <span class="stat-label">Total Revenue</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-value">8,594</span>
+    <span class="stat-label">Registered Users</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-value">80.3%</span>
+    <span class="stat-label">Conversion Rate</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-value">67.5%</span>
+    <span class="stat-label">Repeat Purchase Rate</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-value">₹592</span>
+    <span class="stat-label">Avg Order Value</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-value">7.2%</span>
+    <span class="stat-label">View → Purchase Rate</span>
+  </div>
+</div>
+
+<!-- FINDINGS -->
+<section id="findings">
+  <div class="section-label">Key Findings</div>
+  <h2 class="section-title">What the data reveals</h2>
+  <p class="section-desc">Six datasets merged into one analytical frame — users, orders, products, reviews, and behavioral events — to surface the real story.</p>
+
+  <div class="findings-grid">
+    <div class="finding-card">
+      <div class="finding-number">01 / Revenue</div>
+      <div class="finding-stat">~40%</div>
+      <div class="finding-title">Orders Never Reach Customers</div>
+      <div class="finding-desc">Cancelled and returned orders (~7,800) nearly match completed orders — a major signal of fulfilment or product quality issues worth investigating.</div>
+    </div>
+    <div class="finding-card">
+      <div class="finding-number">02 / Retention</div>
+      <div class="finding-stat green">67.5%</div>
+      <div class="finding-title">Repeat Purchase Rate</div>
+      <div class="finding-desc">5,798 repeat buyers vs 2,796 one-time buyers. Strong retention foundation — the focus should shift to converting the remaining 32.5%.</div>
+    </div>
+    <div class="finding-card">
+      <div class="finding-number">03 / Customers</div>
+      <div class="finding-stat">33.5%</div>
+      <div class="finding-title">Revenue from Top 10%</div>
+      <div class="finding-desc">859 users drive one-third of revenue — healthier than the typical 80/20 rule. These are prime candidates for a loyalty programme.</div>
+    </div>
+    <div class="finding-card">
+      <div class="finding-number">04 / Quality</div>
+      <div class="finding-stat pink">2.76/5</div>
+      <div class="finding-title">Electronics Avg Rating (High-Value Orders)</div>
+      <div class="finding-desc">Electronics leads high-value, low-rated items at ₹8,37,279. 9 of 10 categories appear — this is a platform-wide issue, not isolated.</div>
+    </div>
+    <div class="finding-card">
+      <div class="finding-number">05 / Geography</div>
+      <div class="finding-stat">1,542</div>
+      <div class="finding-title">Cities with High Revenue, Few Users</div>
+      <div class="finding-desc">Single buyers generating ₹40K+ in smaller cities — an untapped market where targeted outreach could yield outsized returns.</div>
+    </div>
+    <div class="finding-card">
+      <div class="finding-number">06 / Catalogue</div>
+      <div class="finding-stat">2.4%</div>
+      <div class="finding-title">Revenue from Top 10 Products</div>
+      <div class="finding-desc">Revenue is distributed across 2,000 products — a true long-tail model. No single blockbuster product; the highest earner (Orion Coach) at ₹1L.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- VISUALS -->
+<div class="visuals-section" id="visuals">
+  <div class="visuals-inner">
+    <div class="section-label">Visualizations</div>
+    <h2 class="section-title">Charts from the analysis</h2>
+    <p class="section-desc">Four key visual outputs from the notebook, each surfacing a distinct dimension of the business.</p>
+
+    <div class="visuals-grid">
+      <div class="viz-card">
+        <img src="conversion funnel.png" alt="Conversion Funnel" class="viz-img"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="viz-img-placeholder" style="display:none;">conversion funnel.png</div>
+        <div class="viz-meta">
+          <div class="viz-title">Product Funnel: View → Cart → Purchase</div>
+          <div class="viz-insight">56K views → 12K carts → 4K purchases. The view→cart drop (78.5%) is the single biggest revenue leak — product pages need work, not checkout.</div>
+        </div>
+      </div>
+
+      <div class="viz-card">
+        <img src="signup to first order.png" alt="Signup to First Order" class="viz-img"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="viz-img-placeholder" style="display:none;">signup to first order.png</div>
+        <div class="viz-meta">
+          <div class="viz-title">Days from Signup to First Order</div>
+          <div class="viz-insight">63% of users bought before signing up (guest checkout). Of post-signup users, average time-to-purchase is ~62 days — a right-skewed distribution.</div>
+        </div>
+      </div>
+
+      <div class="viz-card">
+        <img src="high value low rating.png" alt="High Value Low Rating" class="viz-img"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="viz-img-placeholder" style="display:none;">high value low rating.png</div>
+        <div class="viz-meta">
+          <div class="viz-title">High-Value, Low-Rating Products by Category</div>
+          <div class="viz-insight">Electronics tops with ₹8.37L in high-value, poorly-rated revenue (avg 2.76/5). Quality gaps span 9 out of 10 categories.</div>
+        </div>
+      </div>
+
+      <div class="viz-card">
+        <img src="high user low engagement.png" alt="High User Low Engagement Cities" class="viz-img"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="viz-img-placeholder" style="display:none;">high user low engagement.png</div>
+        <div class="viz-meta">
+          <div class="viz-title">Cities: High Users, Low Engagement</div>
+          <div class="viz-insight">Large registered user bases with below-average browsing. These users are already acquired — re-engagement campaigns could unlock significant revenue.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FUNNEL -->
+<section class="funnel-section" id="funnel">
+  <div class="section-label">Conversion Analysis</div>
+  <h2 class="section-title">The leaky funnel</h2>
+  <p class="section-desc">Of 56,013 product views, only 4,006 result in a purchase. Where exactly does the platform lose customers?</p>
+
+  <div class="funnel-bar-wrap">
+    <div class="funnel-row">
+      <div class="funnel-label">View</div>
+      <div class="funnel-bar-bg">
+        <div class="funnel-bar-fill f-view">56,013 views</div>
+      </div>
+      <div class="funnel-num">100%</div>
+    </div>
+    <div class="funnel-row">
+      <div class="funnel-label">Cart</div>
+      <div class="funnel-bar-bg">
+        <div class="funnel-bar-fill f-cart">12,035</div>
+      </div>
+      <div class="funnel-num">21.5%</div>
+    </div>
+    <div class="funnel-row">
+      <div class="funnel-label">Purchase</div>
+      <div class="funnel-bar-bg">
+        <div class="funnel-bar-fill f-buy"></div>
+      </div>
+      <div class="funnel-num">7.2%</div>
+    </div>
+  </div>
+
+  <p style="margin-top:2rem; font-size:0.9rem; color:var(--muted); max-width:600px; line-height:1.8;">
+    The critical insight: the <strong style="color:var(--accent)">view → cart step loses 78.5%</strong> of users, compared to only 66.7% lost at cart → purchase. This means optimising product pages — images, descriptions, pricing — will deliver far more impact than improving the checkout experience.
+  </p>
+</section>
+
+<hr class="divider">
+
+<!-- RECOMMENDATIONS -->
+<section id="recommendations">
+  <div class="section-label">Business Recommendations</div>
+  <h2 class="section-title">What to do next</h2>
+  <p class="section-desc">Five actionable insights derived directly from the analysis, prioritised by potential impact.</p>
+
+  <div class="reco-list">
+    <div class="reco-item">
+      <div class="reco-icon">🔧</div>
+      <div class="reco-content">
+        <div class="reco-title">Fix the product page first</div>
+        <div class="reco-body">With 78.5% of viewers never adding to cart, the product detail page is the single biggest revenue leak. Audit images, descriptions, pricing clarity, and social proof (ratings) for high-traffic products.</div>
+      </div>
+    </div>
+    <div class="reco-item">
+      <div class="reco-icon">🏆</div>
+      <div class="reco-content">
+        <div class="reco-title">Launch a loyalty programme for the top 10%</div>
+        <div class="reco-body">859 customers drive 33.5% of revenue. A tiered rewards or early-access programme could increase their order frequency further and reduce churn risk from this critical segment.</div>
+      </div>
+    </div>
+    <div class="reco-item">
+      <div class="reco-icon">⚡</div>
+      <div class="reco-content">
+        <div class="reco-title">Investigate Electronics quality urgently</div>
+        <div class="reco-body">₹8.37L in revenue from high-value, poorly-rated Electronics orders (avg 2.76/5) is a returns and churn time-bomb. Quality checks, better product descriptions, or supplier review are needed.</div>
+      </div>
+    </div>
+    <div class="reco-item">
+      <div class="reco-icon">📧</div>
+      <div class="reco-content">
+        <div class="reco-title">Re-engage dormant city users</div>
+        <div class="reco-body">Multiple cities have large user bases with below-average browsing. Email or push re-engagement campaigns targeting these users could convert an already-acquired audience at low acquisition cost.</div>
+      </div>
+    </div>
+    <div class="reco-item">
+      <div class="reco-icon">📍</div>
+      <div class="reco-content">
+        <div class="reco-title">Target high-revenue, low-density cities</div>
+        <div class="reco-body">1,542 cities show single buyers spending ₹40K+. These high-value individuals in smaller cities are an untapped market — geo-targeted campaigns could find more buyers with similar profiles.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TECH STACK -->
+<section>
+  <div class="section-label">Stack</div>
+  <h2 class="section-title">Built with</h2>
+  <div class="tech-chips">
+    <div class="chip">Python 3</div>
+    <div class="chip">Pandas</div>
+    <div class="chip">Matplotlib</div>
+    <div class="chip">Google Colab</div>
+    <div class="chip">Jupyter Notebook</div>
+    <div class="chip">NumPy</div>
+    <div class="chip">CSV / Multi-table joins</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">ecommerce_analysis.ipynb · 2024–2025 Dataset</div>
+  <div class="footer-links">
+    <a href="https://github.com/your-username/ecommerce-analysis" target="_blank">GitHub</a>
+    <a href="https://www.linkedin.com/in/your-profile" target="_blank">LinkedIn</a>
+    <a href="#hero">Back to top ↑</a>
+  </div>
+</footer>
+
+<script>
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+    });
+  });
+
+  // TOC dot helper
+  function scrollTo(id) {
+    const el = document.querySelector(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // Active TOC dot on scroll
+  const sections = ['#hero','#findings','#visuals','#funnel','#recommendations'];
+  const dots = document.querySelectorAll('.toc-dot');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const idx = sections.indexOf('#' + entry.target.id);
+        if (idx >= 0) {
+          dots.forEach(d => d.classList.remove('active'));
+          if (dots[idx]) dots[idx].classList.add('active');
+        }
+      }
+    });
+  }, { threshold: 0.4 });
+
+  sections.forEach(s => {
+    const el = document.querySelector(s);
+    if (el) observer.observe(el);
+  });
+
+  // Animate funnel bars on scroll
+  const funnelSection = document.querySelector('#funnel');
+  let funnelAnimated = false;
+  const funnelObs = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting && !funnelAnimated) {
+      funnelAnimated = true;
+      // bars already have their final widths in CSS; just ensure visible
+    }
+  });
+  if (funnelSection) funnelObs.observe(funnelSection);
+</script>
+
+</body>
+</html>
